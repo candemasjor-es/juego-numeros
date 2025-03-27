@@ -11,8 +11,27 @@ const niveleSelect = document.getElementById('difficultySelect');
 // --- Variables del Juego ---
 let secretNumber;
 let attempts;
-const MAX_NUMBER = 200;
-const MIN_NUMBER = 1;
+
+niveleSelect.addEventListener('change', function(){
+    if (niveleSelect.value === 'facil'){
+        MAX_NUMBER = 50;
+        MIN_NUMBER = 1;
+        console.log(MAX_NUMBER);
+    } else if (niveleSelect.value === 'medio'){
+        MAX_NUMBER = 100;
+        MIN_NUMBER = 1;
+        console.log(MAX_NUMBER);
+    } else if (niveleSelect.value === 'dificil'){
+        MAX_NUMBER = 200;
+        MIN_NUMBER = 1;
+        console.log(MAX_NUMBER);
+    }
+});
+
+let MAX_NUMBER;
+let MIN_NUMBER;
+
+
 
 // --- Funciones ---
 
@@ -32,7 +51,7 @@ function startGame() {
     guessButton.disabled = false; // Habilita el botón de adivinar
     playAgainButton.style.display = 'none'; // Oculta el botón de jugar de nuevo
     guessInput.focus(); // Pone el foco en el input
-
+    
     console.log(`Pssst... el número secreto es ${secretNumber}`); // Ayuda para depurar
 }
 
