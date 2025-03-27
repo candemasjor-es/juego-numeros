@@ -5,6 +5,8 @@ const message = document.getElementById('message');
 const attemptsInfo = document.getElementById('attempts');
 const playAgainButton = document.getElementById('playAgainButton');
 const guessesList = document.getElementById('guessesList');
+const niveleSelect = document.getElementById('difficultySelect');
+
 
 // --- Variables del Juego ---
 let secretNumber;
