@@ -11,27 +11,28 @@ const niveleSelect = document.getElementById('difficultySelect');
 // --- Variables del Juego ---
 let secretNumber;
 let attempts;
+let MAX_NUMBER = 50
+let MIN_NUMBER = 1;
+let previousGuess = null;
 
-niveleSelect.addEventListener('change', function(){
-    if (niveleSelect.value === 'facil'){
-        MAX_NUMBER = 50;
-        MIN_NUMBER = 1;
-        console.log(MAX_NUMBER);
-    } else if (niveleSelect.value === 'medio'){
-        MAX_NUMBER = 100;
-        MIN_NUMBER = 1;
-        console.log(MAX_NUMBER);
-    } else if (niveleSelect.value === 'dificil'){
-        MAX_NUMBER = 200;
-        MIN_NUMBER = 1;
-        console.log(MAX_NUMBER);
-    }
+setDifficulty("facil");
+
+niveleSelect.addEventListener("change", function () {
+    setDifficulty(this.value);
+    startGame();
 });
 
-let MAX_NUMBER;
-let MIN_NUMBER;
-
-
+function setDifficulty(level) {
+    if (level === "facil") {
+        MAX_NUMBER = 50;
+    } else if (level === "medio") {
+        MAX_NUMBER = 100;
+    } else if (level === "dificil") {
+        MAX_NUMBER = 200;
+    }
+    guessInput.setAttribute("max", MAX_NUMBER);
+    guessInput.max = MAX_NUMBER;
+}
 
 // --- Funciones ---
 
@@ -40,9 +41,10 @@ function startGame() {
     // Genera un número secreto entre MIN_NUMBER y MAX_NUMBER
     secretNumber = Math.floor(Math.random() * MAX_NUMBER) + MIN_NUMBER;
     attempts = 0; // Reinicia los intentos
+    previousGuess = null; 
 
     // Mensajes iniciales y estado de la UI
-    guessesList.innerHTML = ''; 
+    guessesList.innerHTML = '';
     message.textContent = '';
     message.className = 'message'; // Quita clases de color
     attemptsInfo.textContent = '';
@@ -51,10 +53,11 @@ function startGame() {
     guessButton.disabled = false; // Habilita el botón de adivinar
     playAgainButton.style.display = 'none'; // Oculta el botón de jugar de nuevo
     guessInput.focus(); // Pone el foco en el input
-    
+
     console.log(`Pssst... el número secreto es ${secretNumber}`); // Ayuda para depurar
 }
 
+// Función para manejar el intento del usuario
 // Función para manejar el intento del usuario
 function handleGuess() {
     const userGuessText = guessInput.value;
@@ -79,24 +82,42 @@ function handleGuess() {
     attempts++;
     attemptsInfo.textContent = `Intentos: ${attempts}`;
 
-    const listItem = document.createElement('li'); // Crea un elemento <li>
-    listItem.textContent = userGuess; // Pone el número dentro del <li>
+    const listItem = document.createElement('li');
+    listItem.textContent = userGuess;
     guessesList.appendChild(listItem);
 
-    if (attempts < 10){
-    // Comparar el intento con el número secreto
-    if (userGuess === secretNumber) {
-        setMessage(`¡Correcto! 🎉 El número era ${secretNumber}. Lo adivinaste en ${attempts} intentos.`, 'correct');
-        endGame();
-    } else if (userGuess < secretNumber) {
-        setMessage('¡Demasiado bajo! Intenta un número más alto. 👇', 'wrong');
+    if (attempts < 10) {
+        if (userGuess === secretNumber) {
+            setMessage(`¡Correcto! 🎉 El número era ${secretNumber}. Lo adivinaste en ${attempts} intentos.`, 'correct');
+            endGame();
+        } else {
+            let hint = "";
+            const currentDiff = Math.abs(userGuess - secretNumber);
+
+            // Solo damos pistas de temperatura si no es el primer intento
+            if (previousGuess !== null) {
+                const previousDiff = Math.abs(previousGuess - secretNumber);
+
+                if (currentDiff < previousDiff) {
+                    hint = " ¡Más caliente! 🔥";
+                } else if (currentDiff > previousDiff) {
+                    hint = " ¡Más frío! 🥶";
+                }
+            }
+
+            if (userGuess < secretNumber) {
+                setMessage("¡Demasiado alto!" + hint, "wrong");
+            } else {
+                setMessage("¡Demasiado bajo!" + hint, "wrong");
+            }
+        }
     } else {
-        setMessage('¡Demasiado alto! Intenta un número más bajo. 👆', 'wrong');
+        setMessage(`¡Has perdido! El número era ${secretNumber}.`, "wrong");
+        endGame();
     }
-} else{
-    setMessage('¡Has perdido!', 'wrong');
-    endGame();
-}
+
+    // Guardar el intento actual para la próxima comparación
+    previousGuess = userGuess; // ¡Esta línea es crucial y faltaba!
 
     // Limpiar el input para el siguiente intento (si no ha ganado)
     if (userGuess !== secretNumber) {
@@ -124,7 +145,7 @@ function endGame() {
 guessButton.addEventListener('click', handleGuess);
 
 // Escuchar la tecla "Enter" en el campo de entrada
-guessInput.addEventListener('keyup', function(event) {
+guessInput.addEventListener('keyup', function (event) {
     // Si la tecla presionada es Enter (código 13)
     if (event.key === 'Enter') {
         event.preventDefault(); // Evita comportamiento por defecto (si estuviera en un form)
