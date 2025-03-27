@@ -4,6 +4,7 @@ const guessButton = document.getElementById('guessButton');
 const message = document.getElementById('message');
 const attemptsInfo = document.getElementById('attempts');
 const playAgainButton = document.getElementById('playAgainButton');
+const guessesList = document.getElementById('guessesList');
 
 // --- Variables del Juego ---
 let secretNumber;
@@ -20,6 +21,7 @@ function startGame() {
     attempts = 0; // Reinicia los intentos
 
     // Mensajes iniciales y estado de la UI
+    guessesList.innerHTML = ''; 
     message.textContent = '';
     message.className = 'message'; // Quita clases de color
     attemptsInfo.textContent = '';
@@ -55,6 +57,10 @@ function handleGuess() {
     // Incrementar el contador de intentos
     attempts++;
     attemptsInfo.textContent = `Intentos: ${attempts}`;
+
+    const listItem = document.createElement('li'); // Crea un elemento <li>
+    listItem.textContent = userGuess; // Pone el número dentro del <li>
+    guessesList.appendChild(listItem);
 
     // Comparar el intento con el número secreto
     if (userGuess === secretNumber) {
